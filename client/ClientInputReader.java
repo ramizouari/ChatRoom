@@ -4,9 +4,10 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
+//class for reading client input from stdin
 public class ClientInputReader extends InputReader 
 {
-	Socket sock;
+	Socket sock;//client socket
 	PrintStream sout;
 	public ClientInputReader(Socket sock,PrintStream out)
 	{
@@ -17,7 +18,7 @@ public class ClientInputReader extends InputReader
 	{
 		Scanner scn=new Scanner(System.in);
 		String msg="";
-		while(!msg.equals("/q"))
+		while(!msg.equals("/q"))// /q for exiting
 		{
 			try
 			{
@@ -29,8 +30,9 @@ public class ClientInputReader extends InputReader
 				System.err.println("Exiting...");
 				break;
 			}
-			sout.println(msg);
+			sout.println(msg);//write the received message
 		}
+		//exiting..
 		scn.close();
 		exit=true;
 		try

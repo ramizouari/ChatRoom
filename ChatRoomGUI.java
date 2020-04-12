@@ -4,6 +4,7 @@ import java.net.*;
 import java.io.*;
 import javax.swing.*;
 
+//launcher dialog that asks for hostname, portnumber, pseudoname and room number
 class Launcher extends JDialog
 {
 	private JLabel hostLabel,portLabel,nameLabel,roomLabel;
@@ -18,11 +19,10 @@ class Launcher extends JDialog
 		roomLabel=new JLabel("Room number: ");
 		hostInput=new JTextField();
 		SpinnerNumberModel portModel=new SpinnerNumberModel();
-		portModel.setMaximum(65535);
+		portModel.setMaximum(65535);//largest port number
 		portModel.setValue(7500);
 		portModel.setMinimum(0);
 		SpinnerNumberModel roomNumberModel=new SpinnerNumberModel();
-		roomNumberModel.setMaximum(20);
 		roomNumberModel.setMinimum(0);
 		portInput=new JSpinner(portModel);
 		nameInput=new JTextField();
@@ -64,6 +64,7 @@ class Launcher extends JDialog
 	}
 }
 
+//an action which is invoked when the connect button is clicked
 class ConnectAction implements ActionListener
 {
 	JComponent parent;
@@ -83,7 +84,7 @@ class ConnectAction implements ActionListener
 	{
 		if(hostName.getText().equals("")||pseudoname.getText().equals(""))
 		{
-			JOptionPane.showMessageDialog(parent, "Please complete parameters");
+			JOptionPane.showMessageDialog(parent, "Fill all fields");
 			return;
 		}
 		Socket sock = null;
@@ -111,7 +112,7 @@ class ConnectAction implements ActionListener
 				if(nameExists)
 					name= JOptionPane.showInputDialog
 						("pseudoname already exists, please type another name");
-				if(name==null)
+				if(name==null)//if user clicked on cancel
 				{
 					sout.println(name);
 					sock.close();
@@ -155,18 +156,18 @@ public class ChatRoomGUI extends JFrame {
 				{
 					public void keyTyped(KeyEvent event)
 					{
-						if(event.getKeyChar()==KeyEvent.VK_ENTER)
+						if(event.getKeyChar()==KeyEvent.VK_ENTER)//if the user clicked on enter after typing message
 						{
-							if(inputField.getText().equals(""))
+							if(inputField.getText().equals(""))//if no input return
 								return;
 							try
 							{
 								PrintStream sout = new PrintStream(sock.getOutputStream());
 								sout.println(inputField.getText());
 							}
-							catch(IOException exc)
+							catch(IOException exc)//connection issue
 							{
-								System.err.println("problem");
+								System.err.println("Unable to send message");
 								JOptionPane.showMessageDialog(ChatRoomGUI.this,
 										exc.getMessage());
 								ChatRoomGUI.this.dispose();
@@ -176,6 +177,7 @@ public class ChatRoomGUI extends JFrame {
 					}
 				});
 		setContentPane(pane);
+		//Thread for writing received messages
 		Thread messageWriter=new Thread(
 				new Runnable()
 				{
@@ -200,12 +202,12 @@ public class ChatRoomGUI extends JFrame {
 								messageArea.setText(messageArea.getText()+"\n"
 									+buff_reader.readLine());
 							}
-							catch(IOException exc)
+							catch(IOException exc)//connection issue
 							{
-								System.err.println("problem");
+								System.err.println("Unable to receive message");
 								JOptionPane.showMessageDialog(ChatRoomGUI.this,
 										exc.getMessage());
-								ChatRoomGUI.this.dispose();
+								ChatRoomGUI.this.dispose();//close window
 								return;
 							}
 								inputField.setText("");
@@ -222,7 +224,6 @@ public class ChatRoomGUI extends JFrame {
 		// TODO Auto-generated method stub
 		Launcher launcher=new Launcher();
 		launcher.setSize(360,150);
-		launcher.setMaximumSize(new Dimension(360,150));
 		launcher.setVisible(true);
 	}
 	

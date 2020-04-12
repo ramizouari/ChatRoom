@@ -4,31 +4,37 @@ import java.util.*;
 import commun.*;
 import client.*;
 
-//class extending Thread for reading input
-
 
 public class ChatRoom
 {
+
+	/*
+		the main function accepts up to 2 arguments (optional)
+		the first argument= localhost name
+		the second argument= port number
+	*/
 	public static void main(String args[])
 	{
 		Scanner scn = new Scanner(System.in);
 		String hostName;
 		int port=0;
-		if(args.length>0)
+		if(args.length>0)//if first argument is given: localhost name
 			hostName=args[0];
-		else
+		else//else read from stdin
 		{
 			System.out.print("Host name:");
 			hostName = scn.nextLine();
 		}
-		boolean readPortNumber=args.length<=1;
-		if(!readPortNumber)
+		
+		//readPortNumber asks whether to get the port number from stdin or not
+		boolean readPortNumber=args.length<=1;//is the port number not given as an argument?
+		if(!readPortNumber)//if it is given as an argument
 		{
 			try
 			{
 				port = Integer.parseInt(args[1]);
 			}
-			catch(NumberFormatException e)
+			catch(NumberFormatException e)//if args[1] is not a number
 			{
 				System.err.println("Not a valid port number");
 				readPortNumber=true;
@@ -36,12 +42,15 @@ public class ChatRoom
 		}
 		if(readPortNumber)
 		{
+			//get port number from stdin
 			System.out.print("Port number");
 			port=scn.nextInt();
+			scn.nextLine();//to remove the caracter \n from buffer
 		}
 		Socket sock=null;
 		try
 		{
+			//establish connection with server
 			sock=new Socket(hostName,port);
 		}
 		catch(IOException e)
@@ -53,9 +62,8 @@ public class ChatRoom
 		PrintStream sout=null;
 		try
 		{
-			scn.nextLine();
-			sout=new PrintStream(sock.getOutputStream());
-			DataInputStream sin = new DataInputStream(sock.getInputStream());
+			sout=new PrintStream(sock.getOutputStream());//socket out
+			DataInputStream sin = new DataInputStream(sock.getInputStream());//socket in
 			boolean nameExists;
 			do
 			{
@@ -78,7 +86,11 @@ public class ChatRoom
 			System.err.println("Other exception: ");
 			System.err.println(e.getMessage());	
 		}
-		ClientInputReader in_reader=new ClientInputReader(sock,sout);//stdin reader
+
+		/*
+			ClientInputReader is a thread for accepting input from stdin
+		*/
+		ClientInputReader in_reader=new ClientInputReader(sock,sout);
 		in_reader.start();
 		BufferedReader buff_reader=null;
 		try
@@ -86,9 +98,9 @@ public class ChatRoom
 			buff_reader=new BufferedReader(new InputStreamReader
 					(sock.getInputStream())); 
 			String str="";
-			while(!in_reader.getExit())
+			while(!in_reader.getExit())//while the client is not asking to exit
 				{
-					str=buff_reader.readLine();
+					str=buff_reader.readLine();//read input from server
 					if(str!=null)
 						System.out.println(str);
 				}

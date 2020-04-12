@@ -3,6 +3,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.net.*;
 import java.io.*;
+
+//class for executing commands
 public abstract class Commands
 {
 	public static void globalBroadcast(Map<Integer,Room>rooms,String msg)
@@ -10,6 +12,7 @@ public abstract class Commands
 		for(Room room:rooms.values())
 			room.broadcast(msg,"Server");
 	}
+
 	public static void closeServer(Map<Integer,Room> rooms,
 			Map<String,Socket> users_list)
 	{
@@ -22,9 +25,11 @@ public abstract class Commands
 			}
 			catch(IOException e)
 			{
-				System.err.println("unable to close connection");
+				System.err.println("Unable to close connection");
 			}
 	}
+
+	//send a message to specific user
 	public static void send(String message,String sender,Socket dest)
 	{
 			try

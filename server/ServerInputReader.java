@@ -46,7 +46,7 @@ public class ServerInputReader extends InputReader
 				}
 				catch(Exception e) 
 				{
-					System.err.println("not a valid room number");
+					System.err.println("Not a valid room number");
 					continue;
 				}
 				int first_space_pos=cmd.indexOf(" ");
