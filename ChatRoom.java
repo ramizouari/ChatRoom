@@ -18,11 +18,11 @@ public class ChatRoom
 			hostName=args[0];
 		else
 		{
-			System.out.print("give host name:");
+			System.out.print("Host name:");
 			hostName = scn.nextLine();
 		}
 		boolean readPortNumber=args.length<=1;
-		if(args.length>1)
+		if(!readPortNumber)
 		{
 			try
 			{
@@ -30,13 +30,13 @@ public class ChatRoom
 			}
 			catch(NumberFormatException e)
 			{
-				System.err.println("not a valid port number");
+				System.err.println("Not a valid port number");
 				readPortNumber=true;
 			}
 		}
 		if(readPortNumber)
 		{
-			System.out.print("give port number");
+			System.out.print("Port number");
 			port=scn.nextInt();
 		}
 		Socket sock=null;
@@ -46,7 +46,7 @@ public class ChatRoom
 		}
 		catch(IOException e)
 		{
-			System.err.println("unable to connect to serve");
+			System.err.println("Unable to connect to server");
 			System.exit(1);
 		}	
 		System.out.println("Connection success");
@@ -59,26 +59,26 @@ public class ChatRoom
 			boolean nameExists;
 			do
 			{
-				System.out.print("give username: ");
+				System.out.print("Username: ");
 				String str=scn.nextLine();
 				sout.println(str);
 				nameExists=sin.readBoolean();
 				if(nameExists)
 					System.out.println("name already exists, try another");
 			}while(nameExists);
-			System.out.print("give room numbre: ");
+			System.out.print("Room number: ");
 			sout.println(scn.nextInt());
 		}
 		catch(IOException e)
 		{
-			System.err.println("unable to reach server");
+			System.err.println("Unable to reach server");
 		}
 		catch(Exception e)
 		{
 			System.err.println("Other exception: ");
 			System.err.println(e.getMessage());	
 		}
-		ClientInputReader in_reader=new ClientInputReader(sock,sout);
+		ClientInputReader in_reader=new ClientInputReader(sock,sout);//stdin reader
 		in_reader.start();
 		BufferedReader buff_reader=null;
 		try
@@ -96,7 +96,7 @@ public class ChatRoom
 		}
 		catch(IOException e)
 		{
-			System.err.println("unable to receive message");
+			System.err.println("Unable to receive message");
 			System.err.println(e.getMessage());
 		}
 		finally
@@ -110,7 +110,7 @@ public class ChatRoom
 			}
 			catch(IOException err)
 			{
-				System.err.println("error: unable to close connection");
+				System.err.println("Error: unable to close connection");
 				System.exit(1);
 			}
 		}
