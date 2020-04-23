@@ -5,7 +5,7 @@ It supports some specific commands in the form of "/command" like /q for exiting
 
 Tested with JDK-12
 
-Minimal supported JDK version is 7
+Minimal supported JDK version is 8
 
 - ChatRoomServer is the Server
 - ChatRoom is the console client
