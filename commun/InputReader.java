@@ -1,5 +1,4 @@
 package commun;
-import java.io.*;
 
 //base class for stdin reading (from the console)
 public abstract class InputReader extends Thread
