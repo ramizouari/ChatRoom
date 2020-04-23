@@ -1,0 +1,4 @@
+- [ ] add support for commands aliases client side and server side
+- [x] add support for change room command
+- [ ] /r command to respond to last private conversation (client side)
+- [ ] rewrite the GUI application to support new features
