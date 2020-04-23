@@ -1,27 +1,28 @@
 package server;
 import java.util.*;
-import java.util.concurrent.*;
-import java.net.*;
-import java.io.*;
 //Class for storing a number of users in a room
 public class Room
 {
-	private Set<Socket> users;
-	public Room(Set<Socket> u)
+	private Set<User> users;
+	public Room(Set<User> u)
 	{
 		users=u;
 	}
 	public Room()
 	{
-		this(Collections.synchronizedSet(new HashSet<Socket>()));
+		this(Collections.synchronizedSet(new HashSet<User>()));
 	}
-	public void add(Socket s)
+	public void add(User s)
 	{
 		users.add(s);
 	}
-	public void remove(Socket s)
+	public void remove(User s)
 	{
 		users.remove(s);
+	}
+	public Set<User> getUsers()
+	{
+		return users;
 	}
 	public int usersNumber()
 	{
@@ -29,8 +30,8 @@ public class Room
 	}
 	public void broadcast(String message,String senderName)
 	{
-		for(Socket s:users)
-			Commands.send(message,senderName,s);
+		for(User s:users)
+			Commands.send(message,senderName,s.getSocket());
 	}
 }
 
