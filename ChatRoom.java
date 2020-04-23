@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import commun.*;
 import client.*;
 
 
@@ -63,17 +62,24 @@ public class ChatRoom
 		try
 		{
 			sout=new PrintStream(sock.getOutputStream());//socket out
-			DataInputStream sin = new DataInputStream(sock.getInputStream());//socket in
+			DataInputStream sock_in = new DataInputStream(sock.getInputStream());//socket in
 			boolean nameExists;
 			do
 			{
 				System.out.print("Username: ");
 				String str=scn.nextLine();
 				sout.println(str);
-				nameExists=sin.readBoolean();
+				nameExists=sock_in.readBoolean();
 				if(nameExists)
-					System.out.println("name already exists, try another");
+					System.out.println("This name already exists or it is reserved, try another one");
 			}while(nameExists);
+			BufferedReader buff_reader=new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			String roomsInfo;
+			do
+			{
+				roomsInfo=buff_reader.readLine();
+				System.out.println(roomsInfo);
+			}while(!roomsInfo.equals(""));
 			System.out.print("Room number: ");
 			sout.println(scn.nextInt());
 		}
