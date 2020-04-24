@@ -118,12 +118,9 @@ public class RegisterUser extends Thread
 					{
 						case "/q":
 						case "/quit":
-						case "/exit"://
 							exit=true;
 							break;
 						case "/whisper":
-						case "/chat":
-						case "/send":
 						{
 							if(cmdSplit.length<2)
 							{
@@ -141,8 +138,12 @@ public class RegisterUser extends Thread
 									Commands.SERVER_NAME,sock);
 								break;
 							}
-								Commands.sendAsPrivateMessage(stream.reduce("", (u,t)->u+' '+t),
+								String msg=stream.reduce("", (u,t)->u+' '+t);
+								Commands.sendAsPrivateMessage(msg,
 									currentUser.getUserName(),destSock);
+								if(sock!=destSock)
+									Commands.sendAsPrivateMessage(msg,
+										currentUser.getUserName(),sock);
 								break;
 						}
 						case "/rooms":
@@ -154,12 +155,10 @@ public class RegisterUser extends Thread
 								new PrintStream(currentUser.getSocket().getOutputStream()));
 								break;
 						case "/user":
-						case "/me":
 							Commands.sendAsPrivateMessage("Your username is "+currentUser.getUserName(),
 								Commands.SERVER_NAME,currentUser.getSocket());
 							break;
 						case "/room":
-						case "/join":
 						{
 							int newRoom=0;
 							if(cmdSplit.length<2)

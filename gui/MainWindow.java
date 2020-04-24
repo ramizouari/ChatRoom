@@ -1,5 +1,5 @@
 package gui;
-
+import client.ClientCommandsAlias;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -10,16 +10,17 @@ public class MainWindow extends JFrame {
 
 	final private JTextArea messageArea;
 	final private JTextField inputField;
-    final private Socket sock;
+	final private Socket sock;
+	private ClientCommandsAlias commandsAlias;
     private boolean exit=false;
 	public MainWindow(Socket s)
 	{
 		sock=s;
+		commandsAlias=new ClientCommandsAlias(new File("ClientCommands.txt"));
 		inputField=new JTextField();
 		messageArea=new JTextArea();
 		messageArea.setRows(3);
         JScrollPane scrollable = new JScrollPane(messageArea);
-       
 		JPanel pane = new JPanel();
 		messageArea.setEditable(false);
 		pane.setLayout(new BorderLayout());
@@ -31,9 +32,17 @@ public class MainWindow extends JFrame {
 					{
 						if(event.getKeyChar()==KeyEvent.VK_ENTER)//if the user clicked on enter after typing message
 						{
-							if(inputField.getText().equals(""))//if no input return
-                                return;
-                            else if(inputField.getText().equals("/q"))
+							if(inputField.getText().isBlank())//if no input return
+								return;
+							String msg=inputField.getText();
+							if(msg.charAt(0)=='/')
+							{
+								String alias=msg.split(" ")[0];
+								String command=commandsAlias.getCommand(alias);
+								if(command!=null)
+									msg=msg.replaceAll("^/[a-zA-Z]+", command);		
+							}
+                            if(msg.equals("/quit"))
                             {
                                 dispose();
                                 exit=true;
@@ -42,7 +51,7 @@ public class MainWindow extends JFrame {
 							try
 							{
 								PrintStream sout = new PrintStream(sock.getOutputStream());
-								sout.println(inputField.getText());
+								sout.println(msg);
 							}
 							catch(IOException exc)//connection issue
 							{

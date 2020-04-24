@@ -86,6 +86,7 @@ public class ConnectAction implements ActionListener {
 		}
 		roomSelect.setSize(300,300);
 		roomSelect.setVisible(true);
+		roomSelect.setTitle("Room Selector");
 		int value=roomSelect.getSelectedRoom();
 		if(roomSelect.getState()==RoomSelector.CANCELED)
 		{
@@ -101,6 +102,7 @@ public class ConnectAction implements ActionListener {
 		}
 		sout.println(value);
 		MainWindow room= new MainWindow(sock);
+		room.setTitle("ChatRoom GUI");
 		room.setVisible(true);
 		room.setSize(300,300);
     }

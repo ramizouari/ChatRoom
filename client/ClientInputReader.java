@@ -7,22 +7,36 @@ import java.net.*;
 //class for reading client input from stdin
 public class ClientInputReader extends InputReader 
 {
-	Socket sock;//client socket
-	PrintStream sout;
+	private Socket sock;//client socket
+	private PrintStream sout;
+	private ClientCommandsAlias clientAlias;
+
 	public ClientInputReader(Socket sock,PrintStream out)
 	{
 		this.sock=sock;
 		sout=out;
+		clientAlias=new ClientCommandsAlias(new File("ClientCommands.txt"));
 	}
+
 	public void run()
 	{
 		Scanner scn=new Scanner(System.in);
 		String msg="";
-		while(!msg.equals("/q"))// /q for exiting
+		while(!msg.equals("/quit"))// /q for exiting
 		{
 			try
 			{
 				msg=scn.nextLine();
+				if(msg.isBlank())
+					continue;
+				if(msg.charAt(0)=='/')
+				{
+					String alias=msg.split(" ")[0];
+					String command=clientAlias.getCommand(alias);
+					if(command!=null)
+						msg=msg.replaceAll("^/[a-zA-Z]+", command);
+					
+				}	
 			}
 			catch(NoSuchElementException e)
 			{
