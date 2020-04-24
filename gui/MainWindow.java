@@ -16,7 +16,7 @@ public class MainWindow extends JFrame {
 	public MainWindow(Socket s)
 	{
 		sock=s;
-		commandsAlias=new ClientCommandsAlias(new File("ClientCommands.txt"));
+		commandsAlias=new ClientCommandsAlias(new File("ClientCommands.cfg"));
 		inputField=new JTextField();
 		messageArea=new JTextArea();
 		messageArea.setRows(3);

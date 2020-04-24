@@ -14,7 +14,7 @@ public class ServerInputReader extends InputReader
 	{
 		rooms =r;
 		users_list=users;
-		commandsAlias=new ServerCommandsAlias(new File("ServerCommands.txt"));
+		commandsAlias=new ServerCommandsAlias(new File("ServerCommands.cfg"));
 	}
 	public void run()
 	{

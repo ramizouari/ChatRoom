@@ -15,7 +15,7 @@ public class ClientInputReader extends InputReader
 	{
 		this.sock=sock;
 		sout=out;
-		clientAlias=new ClientCommandsAlias(new File("ClientCommands.txt"));
+		clientAlias=new ClientCommandsAlias(new File("ClientCommands.cfg"));
 	}
 
 	public void run()

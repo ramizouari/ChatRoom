@@ -38,27 +38,31 @@ abstract public class CommandsAlias
             String line;
             String T[];
             BufferedReader buff_reader=new BufferedReader(new FileReader(f));
+            int lineNumber=0;
             do
             {
+                lineNumber++;
                 line=buff_reader.readLine();
                 if(line==null)
                     break;
                 else  if(line.isBlank()||line.charAt(0)=='#')
                     continue;
                 T=line.split("\t");
-                aliases.put(T[0],T[1]);
+                try
+                {
+                    aliases.put(T[0],T[1]);
+                }
+                catch(ArrayIndexOutOfBoundsException e)
+                {
+                    System.err.println("Error while reading ClientCommands.cfg at line "+lineNumber);
+                    System.err.println("Line content: "+T[0]);
+                }
             }while(true);
             buff_reader.close();
         }
         catch(IOException e)
         {
             System.err.println("Unable to read alias file "+f.getName());
-            System.err.println("Commands aliases won't be supported");
-            fileReadSuccessfully=false;
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
-            System.err.println("file "+f.getName()+" is corrupted");
             System.err.println("Commands aliases won't be supported");
             fileReadSuccessfully=false;
         }
