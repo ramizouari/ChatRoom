@@ -1,8 +1,11 @@
 package server;
+
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.net.*;
 import java.io.*;
-
+import commun.RoomsInfo;
 //class for executing commands
 public abstract class Commands
 {
@@ -10,7 +13,8 @@ public abstract class Commands
 	public static void globalBroadcast(Map<Integer,Room>rooms,String msg)
 	{
 		for(Room room:rooms.values())
-			room.broadcast(msg,SERVER_NAME);
+			for(User u:room.getUsers())
+				sendAsGlobalMessage(msg, u.getSocket());
 	}
 
 	public static void closeServer(Map<Integer,Room> rooms,
@@ -29,13 +33,13 @@ public abstract class Commands
 			}
 	}
 
-	//send a message to specific user
-	public static void send(String message,String sender,Socket dest)
+	public static void sendMessage(String message,String sender,String firstDelimiter,
+		String secondDelimiter,Socket dest)
 	{
 			try
 			{
 				PrintStream sout = new PrintStream(dest.getOutputStream());
-				sout.println("["+sender+"]:  "+message);
+				sout.println(firstDelimiter+sender+secondDelimiter  +message);
 			}
 			catch(IOException e)
 			{
@@ -43,17 +47,25 @@ public abstract class Commands
 			}
 	}
 
-	public static void send(String message,Socket dest)
+	public static void sendAsGlobalMessage(String message,Socket dest)
 	{
-			try
-			{
-				PrintStream sout = new PrintStream(dest.getOutputStream());
-				sout.println(message);
-			}
-			catch(IOException e)
-			{
-				System.err.println(e.getMessage());
-			}
+		sendMessage(message,SERVER_NAME,"#","#: ",dest);
+	}
+	
+
+	public static void sendAsRoomMessage(String message,String sender,Socket dest)
+	{
+		sendMessage(message,sender,"[","]: ",dest);
+	}
+
+	public static void send(String message,Socket dest)//send plain message without specifying sender
+	{
+			sendMessage(message,"","","",dest);
+	}
+
+	public static void sendAsPrivateMessage(String message,String sender,Socket dest)
+	{
+		sendMessage(message,sender,"<<",">>: ",dest);
 	}
 
 	public static void showRoomsInfo(Map<Integer,Room> rooms,PrintStream print_stream)
@@ -72,6 +84,17 @@ public abstract class Commands
 						print_stream.println("\t\t"+u.getUserName());
 				}
 				print_stream.println();//this empty line is used as EOF for the client socket
+	}
+	public static void sendRoomsInfoObject(Map<Integer,Room> rooms,ObjectOutputStream obj_stream) throws IOException
+	{
+		Map<Integer,Set<String>> roomInfo=new HashMap<Integer,Set<String>>();
+		for(Integer id:rooms.keySet())
+		{
+			Stream<String> stream=rooms.get(id).getUsers().stream().map(user->user.getUserName());
+			roomInfo.put(id,stream.collect(Collectors.toSet()));
+		}
+		obj_stream.writeObject(new RoomsInfo(roomInfo));
+		
 	}
 	public static void showUsers(Map<String,Socket> users_list,PrintStream print_stream)
 	{
@@ -96,5 +119,6 @@ public abstract class Commands
 		}	
 		Commands.send(msg,senderName,sock);
 	}*/
+	
 }
 

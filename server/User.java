@@ -5,8 +5,8 @@ import java.net.*;
 //This class contains the information of a user: his username and the socket
 //A one to one correspendence between each socket and each username is assumed
 public class User {
-    Socket sock;
-    String username;
+    private Socket sock;
+    private String username;
     public User(String name,Socket s)
     {
         sock=s;
@@ -31,6 +31,11 @@ public class User {
         else if(o instanceof Socket)
             return o.equals(sock);
         return false;
-
+    }
+    
+    //this method will also assume the one to one correspendence
+    public int hashCode()
+    {
+        return username.hashCode();
     }
 }

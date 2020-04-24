@@ -74,13 +74,14 @@ public class ServerInputReader extends InputReader
 					System.err.println("Username doesn't exist");
 					continue;
 				}	
-					Commands.send(stream.reduce("", (u,t)->u+' '+t),Commands.SERVER_NAME,sock);
+					Commands.sendAsPrivateMessage(stream.reduce("", (u,t)->u+' '+t),Commands.SERVER_NAME,sock);
 			}
 				break;
 			case "/listrooms":
 			case "/roomslist"://print list of rooms with their users
 				Commands.showRoomsInfo(rooms, System.out);
 				break;		
+			case "/users":
 			case "/listusers"://print list of users
 			case "/userslist":
 				Commands.showUsers(users_list,System.out);

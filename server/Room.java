@@ -31,7 +31,7 @@ public class Room
 	public void broadcast(String message,String senderName)
 	{
 		for(User s:users)
-			Commands.send(message,senderName,s.getSocket());
+			Commands.sendAsRoomMessage(message,senderName,s.getSocket());
 	}
 }
 
