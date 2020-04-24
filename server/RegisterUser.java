@@ -1,6 +1,7 @@
 package server;
 
 import java.util.*;
+//import java.util.function.*;
 import java.util.stream.Stream;
 import java.net.*;
 import java.io.*;
@@ -38,10 +39,18 @@ public class RegisterUser extends Thread
 		currentRoom.broadcast(currentUser.getUserName()+" has joined the room", Commands.SERVER_NAME);
 	}
 
-	//register username
-	private void registerName(BufferedReader buff_reader) throws IOException  
+/*	public static final Map<String,Consumer<RegisterUser>> CLIENT_COMMANDS;
+	static
 	{
-		boolean invalidName;
+		CLIENT_COMMANDS = new HashMap<String,Consumer<RegisterUser> >();
+
+	}*/
+
+	//register username
+	private void registerName(ObjectOutputStream obj_out,
+			BufferedReader buff_reader) throws IOException  
+	{
+		Boolean invalidName;
 		String userName="";
 		do
 		{
@@ -52,8 +61,8 @@ public class RegisterUser extends Thread
 				return;
 			}
 			invalidName=userName.isEmpty()||users.containsKey(userName);
-			DataOutputStream data_out = new DataOutputStream(sock.getOutputStream());
-				data_out.writeBoolean(invalidName);
+				obj_out.writeBoolean(invalidName);
+				obj_out.flush();
 			
 		}while(invalidName);//name already exists or reserved	
 		currentUser=new User(userName,sock);
@@ -66,18 +75,20 @@ public class RegisterUser extends Thread
 		BufferedReader buff_reader=null;
 		try
 		{
+			ObjectOutputStream obj_out=new ObjectOutputStream(sock.getOutputStream());
 			buff_reader=new BufferedReader
 			(new InputStreamReader(sock.getInputStream()));
-			registerName(buff_reader);
+			registerName(obj_out,buff_reader);
 			try
 			{
-				Commands.showRoomsInfo(rooms, new PrintStream(sock.getOutputStream()));
+				Commands.sendRoomsInfoObject(rooms, obj_out);
+				//Commands.showRoomsInfo(rooms, new PrintStream(sock.getOutputStream()));
 				room_number= Integer.parseInt(buff_reader.readLine());
 			}
 			catch(NumberFormatException e)
 			{
-				Commands.send("not a valid room number\n"+
-			"you have been affected to room 0", Commands.SERVER_NAME, sock);
+				Commands.sendAsPrivateMessage("not a valid room number\n"+
+			"you have been affected to room 0" ,Commands.SERVER_NAME, sock);
 			}
 			affectToRoom(room_number);
 		}
@@ -116,18 +127,21 @@ public class RegisterUser extends Thread
 						{
 							if(cmdSplit.length<2)
 							{
-								Commands.send("Invalid command format",Commands.SERVER_NAME,sock);
-								Commands.send("/send [username] [message]",Commands.SERVER_NAME,sock);
+								Commands.sendAsPrivateMessage("Invalid command format",
+									Commands.SERVER_NAME,sock);
+								Commands.sendAsPrivateMessage("/send [username] [message]",
+									Commands.SERVER_NAME,sock);
 								break;
 							}
 							Stream<String> stream = Arrays.stream(cmdSplit).skip(2);//requires java 8
 							Socket destSock=users.get(cmdSplit[1]);
 							if(destSock==null)
 							{
-								Commands.send("Username doesn't exist",Commands.SERVER_NAME,sock);
+								Commands.sendAsPrivateMessage("Username doesn't exist",
+									Commands.SERVER_NAME,sock);
 								break;
 							}
-								Commands.send(stream.reduce("", (u,t)->u+' '+t),
+								Commands.sendAsPrivateMessage(stream.reduce("", (u,t)->u+' '+t),
 									currentUser.getUserName(),destSock);
 								break;
 						}
@@ -141,8 +155,8 @@ public class RegisterUser extends Thread
 								break;
 						case "/user":
 						case "/me":
-							Commands.send("Your username is "+currentUser.getUserName(),Commands.SERVER_NAME, 
-								currentUser.getSocket());
+							Commands.sendAsPrivateMessage("Your username is "+currentUser.getUserName(),
+								Commands.SERVER_NAME,currentUser.getSocket());
 							break;
 						case "/room":
 						case "/join":
@@ -150,7 +164,8 @@ public class RegisterUser extends Thread
 							int newRoom=0;
 							if(cmdSplit.length<2)
 							{
-								Commands.send("Your current room is "+room_number, Commands.SERVER_NAME, sock);
+								Commands.sendAsPrivateMessage("Your current room is "+room_number,
+								Commands.SERVER_NAME, sock);
 								break;
 							}
 							try
@@ -159,7 +174,8 @@ public class RegisterUser extends Thread
 							}
 							catch(NumberFormatException e)
 							{
-								Commands.send("not a valid room number", Commands.SERVER_NAME, sock);
+								Commands.sendAsPrivateMessage("not a valid room number",
+								Commands.SERVER_NAME, sock);
 								break;
 							}
 								currentRoom.remove(currentUser);
@@ -173,7 +189,7 @@ public class RegisterUser extends Thread
 						}
 
 						default:
-						Commands.send("Unknown command",Commands.SERVER_NAME,sock);
+						Commands.sendAsPrivateMessage("Unknown command",Commands.SERVER_NAME,sock);
 						break;
 					}
 				}

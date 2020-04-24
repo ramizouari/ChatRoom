@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import client.*;
-
+import commun.RoomsInfo;
 
 public class ChatRoom
 {
@@ -62,7 +62,7 @@ public class ChatRoom
 		try
 		{
 			sout=new PrintStream(sock.getOutputStream());//socket out
-			DataInputStream sock_in = new DataInputStream(sock.getInputStream());//socket in
+			ObjectInputStream sock_in = new ObjectInputStream(sock.getInputStream());//socket in
 			boolean nameExists;
 			do
 			{
@@ -73,19 +73,22 @@ public class ChatRoom
 				if(nameExists)
 					System.out.println("This name already exists or it is reserved, try another one");
 			}while(nameExists);
-			BufferedReader buff_reader=new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			/*BufferedReader buff_reader=new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			String roomsInfo;
 			do
 			{
 				roomsInfo=buff_reader.readLine();
 				System.out.println(roomsInfo);
-			}while(!roomsInfo.equals(""));
+			}while(!roomsInfo.equals(""));*/
+			RoomsInfo roomsInfo=(RoomsInfo)sock_in.readObject();
+			System.out.print(roomsInfo.toString());
 			System.out.print("Room number: ");
 			sout.println(scn.nextInt());
 		}
 		catch(IOException e)
 		{
 			System.err.println("Unable to reach server");
+			System.err.println(e.getMessage());
 		}
 		catch(Exception e)
 		{
