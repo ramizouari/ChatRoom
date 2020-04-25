@@ -2,30 +2,20 @@ package commun;
 import java.io.*;
 import java.util.*;
 
-abstract public class CommandsAlias
+/*
+    This class stores the aliases of commands
+    the commandList is set of commands
+    the file in parameter is containing the commands as function of aliases 
+    (see ClientCommands.cfg and ServerCommands.cfg for more details)
+*/
+public class CommandsAlias
 {
     protected Map<String,String> aliases;
     protected boolean fileReadSuccessfully=true;
-   /* public CommandsAlias(File f) throws IOException,ArrayIndexOutOfBoundsException
-    {  
-        aliases=new HashMap<String,String>();
-         String line;
-        String T[];
-        BufferedReader buff_reader=new BufferedReader(new FileReader(f));
-        do
-        {
-            line=buff_reader.readLine();
-            if(line==null)
-                break;
-            T=line.split("\t");
-            aliases.put(T[0],T[1]);
-        }while(true);
-        buff_reader.close();
-    }*/
     public CommandsAlias(File f,Set<String> commandsList)
     {   
         aliases=new HashMap<String,String>();
-        //list of common commands
+        //list of commands that are common between server and client
         aliases.put("/help","/help");
         aliases.put("/rooms","/rooms");
         aliases.put("/users","/users");
@@ -45,34 +35,39 @@ abstract public class CommandsAlias
                 line=buff_reader.readLine();
                 if(line==null)
                     break;
-                else  if(line.isBlank()||line.charAt(0)=='#')
+                else  if(line.isBlank()||line.charAt(0)=='#')//# for comments and also blank line is ignored
                     continue;
-                T=line.split("\t");
+                T=line.split("\t| +");//seperator is a TAB
                 try
                 {
-                    aliases.put(T[0],T[1]);
+                    aliases.put(T[0],T[1]);//first column of T for alias, second one for the command
                 }
-                catch(ArrayIndexOutOfBoundsException e)
+                catch(ArrayIndexOutOfBoundsException e)//a line is corrupted
                 {
                     System.err.println("Error while reading ClientCommands.cfg at line "+lineNumber);
-                    System.err.println("Line content: "+T[0]);
                 }
             }while(true);
             buff_reader.close();
         }
-        catch(IOException e)
+        catch(IOException e)//if unable to read file
         {
             System.err.println("Unable to read alias file "+f.getName());
             System.err.println("Commands aliases won't be supported");
             fileReadSuccessfully=false;
         }
     }
-    public String getCommand(String alias)
+    public String getCommand(String a)//return the command as function of a
     {
-        return aliases.getOrDefault(alias, "/unknown");
+        //if is the alias is a is not found as a key in the aliases map, it will be returned as it is
+        String lowerCaseAlias=a.toLowerCase();
+        return aliases.getOrDefault(lowerCaseAlias, lowerCaseAlias);
     }
     public boolean isFileSuccessfullyRead()
     {
         return fileReadSuccessfully;
     }
+    public static boolean isCommand(String msg)
+	{
+		return (msg!=null)&&(msg.charAt(0)=='/');
+	}
 }

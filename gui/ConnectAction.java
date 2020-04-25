@@ -1,14 +1,22 @@
 package gui;
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
 import commun.RoomsInfo;
 
-//an action which is invoked when the connect button is clicked
+/*
+	An action which is invoked when the connect button is clicked, The executed action will:
+	- Verify whether the user filled the form or not, then try to find the correspending server..
+	- If the server has been found, it will verify the uniqueness and valideness of the username, if not it will ask 
+	for giving another username until giving a unique one
+	- Then a RoomSelector dialog will be created which will gives you information about each room and its
+	users
+	- Finally, if the user choosed a room, a Chatter window will be created and the user will have the
+	ability to exchange messages with others
+*/
 public class ConnectAction implements ActionListener {
-    JComponent parent;
+    JComponent parent;//the parent component
     JTextField hostName, pseudoname;
     JSpinner portNumber;
 
@@ -21,18 +29,19 @@ public class ConnectAction implements ActionListener {
 
 	public void actionPerformed(ActionEvent event)
 	{
-		if(hostName.getText().equals("")||pseudoname.getText().equals(""))
+		if(hostName.getText().isEmpty()||pseudoname.getText().isEmpty())//if the form is not filled
 		{
 			JOptionPane.showMessageDialog(parent, "Fill all fields");
 			return;
 		}
-		Socket sock = null;
-		try
+		Socket sock = null;//user's socket
+		// trying to establish connection with the correspending server
+		try 
 		{
 			sock = new Socket(hostName.getText(),
 					(Integer)portNumber.getValue());
 		}
-		catch(IOException e)
+		catch(IOException e)//if the connection is unsuccessfull
 		{
 			System.err.println(e.getMessage());
 			JOptionPane.showMessageDialog(parent,e.getMessage());
@@ -40,33 +49,39 @@ public class ConnectAction implements ActionListener {
 		}
 		PrintStream sout=null;
 		ObjectInputStream sin =null;
+		String name = pseudoname.getText();
 		try
 		{
 			sout = new PrintStream(sock.getOutputStream());
-			String name = pseudoname.getText();
 			sin = new ObjectInputStream(sock.getInputStream());
-			boolean nameExists;
+			boolean invalidName;
 			do
 			{
+				/*
+				The user will send the candidate username to the server
+				then the server will respong whether it is valid or not
+				Valid means it is unique and not reserved
+				Reserved names are "","Server" and any blank string
+				 */
 				sout.println(name);
-				nameExists=sin.readBoolean();
-				if(nameExists)
+				invalidName=sin.readBoolean();//the response of the server 
+				if(invalidName)
 					name= JOptionPane.showInputDialog
 						("pseudoname already exists, please type another name");
 				if(name==null)//if user clicked on cancel
 				{
-					sout.println(name);
-					sock.close();
+					sout.println(name);//Don't know why I sent a null
+					sock.close();//close the connection
 					return;
 				}
-			}while(nameExists);
+			}while(invalidName);//while the username is not valid asks the user again for another one
 		}
-		catch(IOException e)
+		catch(IOException e)// if the communication with the server has been interrupted
 		{
 			System.err.println(e.getMessage());
 			return;
         }
-		RoomsInfo roomsInfo=null;
+		RoomsInfo roomsInfo=null;//rooms info is a class containing the ID's of rooms and each room's users
 		RoomSelector roomSelect=null;
         try
         {
@@ -77,22 +92,28 @@ public class ConnectAction implements ActionListener {
 		{
 			JOptionPane.showMessageDialog(parent,"Error while loading list of rooms");
 			System.err.println(e.getMessage());
+			/*
+				This constructor will be sent when reading roomsInfo has been unsuccessful
+				It will Create a room selector without the list of rooms
+				this exception maybe raised if the class won't be found, or the two versions of the class
+				between the server and the client differ
+			*/
 			roomSelect = new RoomSelector();
 		}
         catch(IOException e)
         {
-            JOptionPane.showMessageDialog(parent, "Unable to get rooms list");
+            JOptionPane.showMessageDialog(parent, "Unable communicte with the server");
             return;
 		}
 		roomSelect.setSize(300,300);
 		roomSelect.setVisible(true);
 		roomSelect.setTitle("Room Selector");
-		int value=roomSelect.getSelectedRoom();
-		if(roomSelect.getState()==RoomSelector.CANCELED)
+		int value=roomSelect.getSelectedRoom();//returns the value of the selected room
+		if(roomSelect.getState()==RoomSelector.CANCELED)//if the user canceled the selection of the room
 		{
 			try
 			{
-				sock.close();
+				sock.close();//close connection with the server
 			}
 			catch(IOException e)
 			{
@@ -100,8 +121,8 @@ public class ConnectAction implements ActionListener {
 			}
 			return;
 		}
-		sout.println(value);
-		MainWindow room= new MainWindow(sock);
+		sout.println(value);//send the room number to the server
+		Chatter room= new Chatter(name,sock);//creates a Chatter window
 		room.setTitle("ChatRoom GUI");
 		room.setVisible(true);
 		room.setSize(300,300);

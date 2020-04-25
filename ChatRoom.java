@@ -59,6 +59,7 @@ public class ChatRoom
 		}	
 		System.out.println("Connection success");
 		PrintStream sout=null;
+		String name="";
 		try
 		{
 			sout=new PrintStream(sock.getOutputStream());//socket out
@@ -67,8 +68,8 @@ public class ChatRoom
 			do
 			{
 				System.out.print("Username: ");
-				String str=scn.nextLine();
-				sout.println(str);
+				name=scn.nextLine();
+				sout.println(name);
 				nameExists=sock_in.readBoolean();
 				if(nameExists)
 					System.out.println("This name already exists or it is reserved, try another one");
@@ -99,7 +100,8 @@ public class ChatRoom
 		/*
 			ClientInputReader is a thread for accepting input from stdin
 		*/
-		ClientInputReader in_reader=new ClientInputReader(sock,sout);
+		PrivateConversationTracker convTracker=new PrivateConversationTracker(name);
+		ClientInputReader in_reader=new ClientInputReader(sock,sout,convTracker);
 		in_reader.start();
 		BufferedReader buff_reader=null;
 		try
@@ -112,6 +114,7 @@ public class ChatRoom
 					str=buff_reader.readLine();//read input from server
 					if(str!=null)
 						System.out.println(str);
+					convTracker.track(str);
 				}
 			
 		}

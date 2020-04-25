@@ -19,41 +19,46 @@ public class Launcher extends JDialog
 		portLabel=new JLabel("Port number: ");
 		nameLabel=new JLabel("Pseudoname: ");
 		hostInput=new JTextField();
+		//Setting model for port numbers
 		SpinnerNumberModel portModel=new SpinnerNumberModel();
 		portModel.setMaximum(65535);//largest port number
 		portModel.setValue(7500);
 		portModel.setMinimum(0);
+		//Setting model for room numbers
 		SpinnerNumberModel roomNumberModel=new SpinnerNumberModel();
 		roomNumberModel.setMinimum(0);
 		portInput=new JSpinner(portModel);
 		nameInput=new JTextField();
 		exitButton=new JButton("Exit");
 		connectButton=new JButton("Connect");
-		JPanel pane=new JPanel(new GridLayout(5,1));
-		JPanel buttonsPane=new JPanel();
-		buttonsPane.setLayout(new BoxLayout(buttonsPane,BoxLayout.X_AXIS));
-		buttonsPane.add(connectButton);
-		buttonsPane.add(exitButton);
+		JPanel formPanel=new JPanel(new GridLayout(5,1));//panel that hold the form
+		JPanel buttonsPanel=new JPanel();//panel that holds the two buttons
+		//Setting layout for the buttonsPanel
+		buttonsPanel.setLayout(new BoxLayout(buttonsPanel,BoxLayout.X_AXIS));
+		buttonsPanel.add(connectButton);
+		buttonsPanel.add(exitButton);
+		//Setting layout for formPanel
 		hostLabel.setLabelFor(hostInput);
 		portLabel.setLabelFor(portInput);
 		nameLabel.setLabelFor(nameInput);
-		pane.add(hostLabel);
-		pane.add(hostInput);
-		pane.add(portLabel);
-		pane.add(portInput);
-		pane.add(nameLabel);
-		pane.add(nameInput);
-		pane.add(buttonsPane);
-		setContentPane(pane);
+		formPanel.add(hostLabel);
+		formPanel.add(hostInput);
+		formPanel.add(portLabel);
+		formPanel.add(portInput);
+		formPanel.add(nameLabel);
+		formPanel.add(nameInput);
+		formPanel.add(buttonsPanel);
+		setContentPane(formPanel);
+		//Adding action listenerss
 		exitButton.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						System.exit(0);
 					}
-				});
+				});//action invoked if exit button is clicked
 		connectButton.addActionListener(new ConnectAction(hostInput,
-				portInput,nameInput ,pane));
+				portInput,nameInput ,formPanel));//Action invoked if connect button is clicked
 		
 	}
 }

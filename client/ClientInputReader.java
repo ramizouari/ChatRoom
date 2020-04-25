@@ -7,12 +7,14 @@ import java.net.*;
 //class for reading client input from stdin
 public class ClientInputReader extends InputReader 
 {
+	private PrivateConversationTracker  convTracker;
 	private Socket sock;//client socket
 	private PrintStream sout;
 	private ClientCommandsAlias clientAlias;
 
-	public ClientInputReader(Socket sock,PrintStream out)
+	public ClientInputReader(Socket sock,PrintStream out,PrivateConversationTracker tracker)
 	{
+		convTracker=tracker;
 		this.sock=sock;
 		sout=out;
 		clientAlias=new ClientCommandsAlias(new File("ClientCommands.cfg"));
@@ -22,20 +24,24 @@ public class ClientInputReader extends InputReader
 	{
 		Scanner scn=new Scanner(System.in);
 		String msg="";
-		while(!msg.equals("/quit"))// /q for exiting
+		while(!clientAlias.getCommand(msg).equals("/quit"))// /quit for exiting
 		{
 			try
 			{
 				msg=scn.nextLine();
 				if(msg.isBlank())
 					continue;
-				if(msg.charAt(0)=='/')
+				if(CommandsAlias.isCommand(msg))
 				{
 					String alias=msg.split(" ")[0];
 					String command=clientAlias.getCommand(alias);
-					if(command!=null)
-						msg=msg.replaceAll("^/[a-zA-Z]+", command);
-					
+					if(command.equals("/r"))
+					{
+						String lastSender=convTracker.getLastSender();
+						if(lastSender!=null)
+							command="/whisper "+lastSender;
+					}
+					msg=msg.replaceAll("^/[a-zA-Z]+", command);
 				}	
 			}
 			catch(NoSuchElementException e)

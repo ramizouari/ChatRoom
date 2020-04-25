@@ -7,5 +7,5 @@ target_server_location="../ChatRoomBin/Server"
 target_client_location="../ChatRoomBin/Client"
 javac ChatRoomServer.java -d $target_server_location
 javac ChatRoom.java ChatRoomGUI.java -d $target_client_location
-cp ClientCommands.cfg $target_client_location
-cp ServerCommands.cfg $target_server_location
+cp ClientCommands.cfg README.md $target_client_location
+cp ServerCommands.cfg README.md $target_server_location

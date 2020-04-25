@@ -1,7 +1,5 @@
 import gui.Launcher;
 
-
-
 public class ChatRoomGUI {
 	
 	public static void main(String[] args) {

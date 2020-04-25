@@ -12,6 +12,7 @@ public class ServerCommandsAlias extends CommandsAlias{
         commands=new HashSet<String>();
         commands.add("/broadcast");//send a global message to all connected users
         commands.add("/postroom");//send a message to all users in a specific rooms
+        commands.add("/ban");//ban a particular user
     }
     public ServerCommandsAlias(File f)
     {
