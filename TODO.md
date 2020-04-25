@@ -5,4 +5,4 @@
 - [o] adding a Message class to ease sending and receiving messages and for adding more information to each message (like type of message, time in which it is sent,sender...)
 - [x] /r command to respond to last private conversation (client side)
 - [x] rewrite the GUI application to support new features
-- [ ] add username checking
+- [x] add username checking

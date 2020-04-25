@@ -1,4 +1,5 @@
 #!/bin/bash
+#executable with bash
 #this script will compile Client and Server files then place each to its target location 
 #specified by the variables below:
 #if you add files to the project that are not dependant to ChatRoomServer.java,ChatRoom.java or ChatRoomGUI.java
@@ -7,5 +8,5 @@ target_server_location="../ChatRoomBin/Server"
 target_client_location="../ChatRoomBin/Client"
 javac ChatRoomServer.java -d $target_server_location
 javac ChatRoom.java ChatRoomGUI.java -d $target_client_location
-cp ClientCommands.cfg README.md $target_client_location
-cp ServerCommands.cfg README.md $target_server_location
+cp ClientCommands.cfg README.md COMMANDS.md $target_client_location
+cp ServerCommands.cfg README.md COMMANDS.md $target_server_location

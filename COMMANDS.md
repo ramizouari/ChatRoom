@@ -1,6 +1,6 @@
 # Commands
 
-This is a list of currently supported commands, commands aliases are not included (you can see them in configuration files)
+This is a list of currently supported commands. Commands aliases are not included (you can see them in configuration files)
 
 1. Common commands between the user and server, which have
     - /help for getting help

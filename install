@@ -1,0 +1,30 @@
+#!/bin/bash
+#executable with bash
+#this script will compile Client and Server files, then it will then create 3 executable jar archives,
+#one for each application, then it will copy the jar files and configuration files to the target location
+#specified by the variables below:
+#if you add files to the project that are not dependant to ChatRoomServer.java,ChatRoom.java or ChatRoomGUI.java
+#you must add them manually to the script or compile them then  move them manually to the target directory
+dev_loc=`pwd`
+target_server_location="../ChatRoomBin/Server" #target location of Server
+target_client_location="../ChatRoomBin/Client" #target location of Client
+#create necessary folders and copy Client configuration files
+mkdir -p "$target_client_location" && cp ClientCommands.cfg README.md COMMANDS.md $target_client_location 
+#create necessary folders and copy Server configuration files
+mkdir -p "$target_server_location" && cp ServerCommands.cfg README.md COMMANDS.md $target_server_location
+cd $target_server_location && target_server_location=`pwd` #get absolute path
+cd $dev_loc
+cd $target_client_location && target_client_location=`pwd` #get absolute path
+cd $dev_loc
+javac ChatRoomServer.java -d /tmp/ChatRoomBinServer #Server Files
+javac ChatRoom.java ChatRoomGUI.java -d /tmp/ChatRoomBinClient #Client Files
+#create jar executable
+(cd /tmp/ChatRoomBinClient;
+ jar cvfe ChatRoom.jar ChatRoom ChatRoom.class `find  -maxdepth 1 -mindepth 1 -type d`;
+ jar cvfe ChatRoomGUI.jar ChatRoomGUI ChatRoomGUI.class `find -maxdepth 1 -mindepth 1 -type d`;
+ mkdir -p "$target_client_location" && mv *.jar "$target_client_location"
+)
+(cd /tmp/ChatRoomBinServer;
+ jar cvfe "ChatRoomServer.jar" ChatRoomServer *.class `find  -maxdepth 1 -mindepth 1 -type d`;
+  mkdir -p "$target_server_location" && mv *.jar "$target_server_location";
+)

@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import client.*;
-import commun.RoomsInfo;
+import commun.*;
 
 public class ChatRoom
 {
@@ -64,16 +64,28 @@ public class ChatRoom
 		{
 			sout=new PrintStream(sock.getOutputStream());//socket out
 			ObjectInputStream sock_in = new ObjectInputStream(sock.getInputStream());//socket in
-			boolean nameExists;
+			int nameState;
 			do
 			{
 				System.out.print("Username: ");
 				name=scn.nextLine();
 				sout.println(name);
-				nameExists=sock_in.readBoolean();
-				if(nameExists)
-					System.out.println("This name already exists or it is reserved, try another one");
-			}while(nameExists);
+				nameState=sock_in.readInt();
+				switch(nameState)
+				{
+					case NameState.INVALID:
+						System.out.print("This username is invalid, you can only use alphanumeric characters: ");
+						System.out.println(" a-z,A-Z,0-9 and the underscore");
+						System.out.println("the username must contains at least 3 characters");
+						System.out.println("Example: -fofo64\n\t- fofo_here\n\t- gg_izi_20");
+						break;
+					case NameState.EXISTS:
+						System.out.println("This name already exists or it is reserved, try another one");
+						break;
+					case NameState.RESERVED:
+						System.out.println("This name is reserved, try another");
+				}
+			}while(nameState!=NameState.VALID);
 			/*BufferedReader buff_reader=new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			String roomsInfo;
 			do

@@ -16,6 +16,7 @@ public class RoomSelector extends JDialog {
     final private JSpinner roomInput;
     final private JButton joinButton;
     final private JButton cancelButton;
+    final private JLabel numberOfRoomsLabel;
     private JTree tree;
     private int state;
 
@@ -44,7 +45,9 @@ public class RoomSelector extends JDialog {
         roomInput=new JSpinner();
         joinButton =new JButton("Join");
         cancelButton=new JButton("Cancel");
-       tree=new JTree(generateRoomsTree(roomsInfo));
+        TreeNode root = generateRoomsTree(roomsInfo);
+        numberOfRoomsLabel=new JLabel("Number of rooms: "+root.getChildCount());
+       tree=new JTree(root);
        tree.setRootVisible(false);
         //editing spinner model
         SpinnerNumberModel spinnerModel=new SpinnerNumberModel();
@@ -60,6 +63,7 @@ public class RoomSelector extends JDialog {
         //editing dialog layout
         panel.setLayout(new BorderLayout());
         panel.add(tree,BorderLayout.CENTER);
+        panel.add(numberOfRoomsLabel,BorderLayout.NORTH);
         panel.add(southPanel,BorderLayout.SOUTH);
         setContentPane(panel);
         //setting dialog modal (it blocks other windows)
@@ -94,6 +98,7 @@ public class RoomSelector extends JDialog {
         roomInput=new JSpinner();
         joinButton =new JButton("Join");
         cancelButton=new JButton("Cancel");
+        numberOfRoomsLabel=new JLabel("Error getting informations about rooms");
         JLabel errorLabel=new JLabel("An error occured while loading the list of rooms");
         //editing spinner model
         SpinnerNumberModel spinnerModel=new SpinnerNumberModel();
@@ -108,6 +113,7 @@ public class RoomSelector extends JDialog {
         southPanel.add(cancelButton);
         //editing dialog layout
         panel.setLayout(new BorderLayout());
+        panel.add(numberOfRoomsLabel,BorderLayout.NORTH);
         panel.add(errorLabel,BorderLayout.CENTER);
         panel.add(southPanel,BorderLayout.SOUTH);
         setContentPane(panel);

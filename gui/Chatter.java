@@ -1,4 +1,5 @@
 package gui;
+
 import client.ClientCommandsAlias;
 import client.PrivateConversationTracker;
 
@@ -7,7 +8,7 @@ import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 import javax.swing.*;
-import java.util.*;
+import javax.swing.text.DefaultCaret;
 
 //created after connecting and choosing room
 //this is the window that gives the user the ability to talk with otherss
@@ -29,7 +30,10 @@ public class Chatter extends JFrame {
 		inputField=new JTextField();//where the user write his messages
 		messageArea=new JTextArea();//where the user get incoming messages
 		messageArea.setRows(3);
-        JScrollPane scrollable = new JScrollPane(messageArea);//Pattern Strategy: gives the ability to scroll
+        final JScrollPane scrollable = new JScrollPane(messageArea);//Pattern Strategy: gives the ability to scroll
+		DefaultCaret caret = (DefaultCaret)messageArea.getCaret();
+  		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		scrollable.setWheelScrollingEnabled(true);
 		JPanel pane = new JPanel();
 		messageArea.setEditable(false);//who wants to edit incoming messages?
 		pane.setLayout(new BorderLayout());
@@ -96,6 +100,7 @@ the server will respond by sending an error
 							{
 								PrintStream sout = new PrintStream(sock.getOutputStream());
 								sout.println(msg);//sending message (or command) to the server
+								inputField.setText("");//clear inputField
 							}
 							catch(IOException exc)//connection issue
 							{
@@ -148,7 +153,6 @@ the server will respond by sending an error
                                         Chatter.this.dispose();//close window
 								return;
 							}
-								inputField.setText("");//clear the input field
 						}
 					}
                 });

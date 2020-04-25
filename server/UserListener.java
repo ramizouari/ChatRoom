@@ -1,7 +1,7 @@
 package server;
 
 import java.util.*;
-//import java.util.function.*;
+import java.util.regex.*;
 import java.util.stream.Stream;
 import java.net.*;
 import java.io.*;
@@ -46,8 +46,10 @@ public class UserListener extends Thread
 	private void registerName(ObjectOutputStream obj_out,
 			BufferedReader buff_reader) throws IOException  
 	{
-		Boolean invalidName;
+		int nameState;
 		String userName="";
+		//Only characters,numbers and _, the name should contains at least 2 characters
+		Pattern pat=Pattern.compile("^[a-zA-Z0-9_]{3,}$");
 		do
 		{
 			userName = buff_reader.readLine();
@@ -57,18 +59,26 @@ public class UserListener extends Thread
 				sock.close();
 				return;
 			}
-			invalidName=userName.isEmpty()||users.containsKey(userName);
-				obj_out.writeBoolean(invalidName);
+			Matcher matcher=pat.matcher(userName);
+
+			if(!matcher.find())
+				nameState=NameState.INVALID;
+			else if(users.containsKey(userName))
+				nameState=NameState.EXISTS;
+			else if(userName.equals("Server"))
+				nameState=NameState.RESERVED;
+			else nameState=NameState.VALID;
+				obj_out.writeInt(nameState);
 				obj_out.flush();
 			
-		}while(invalidName);//name already exists or reserved	
+		}while(nameState!=NameState.VALID);//name already exists or reserved	
 		user=new User(userName,sock);
 		users.put(userName,sock);//add user to the list
 	}
 
 	public void run()
 	{
-		int room_number=0;
+		int room_number=-1;
 		BufferedReader buff_reader=null;
 		try
 		{
@@ -83,6 +93,7 @@ public class UserListener extends Thread
 			}
 			catch(NumberFormatException e)
 			{
+				room_number=0;
 				Commands.sendAsPrivateMessage("not a valid room number\n"+
 			"you have been affected to room 0" ,Commands.SERVER_NAME, sock);
 			}
@@ -90,7 +101,8 @@ public class UserListener extends Thread
 		}
 		catch(IOException e)// I/O exception, connection is impossible
 		{
-			users.remove(user.getUserName());//remove user from the list of users
+			if(user!=null)
+				users.remove(user.getUserName());//remove user from the list of users
 			System.err.println(e.getMessage());
 			return;//close the thread
 		}

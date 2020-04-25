@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
+
+import commun.NameState;
 import commun.RoomsInfo;
 
 /*
@@ -54,7 +56,7 @@ public class ConnectAction implements ActionListener {
 		{
 			sout = new PrintStream(sock.getOutputStream());
 			sin = new ObjectInputStream(sock.getInputStream());
-			boolean invalidName;
+			int nameState;
 			do
 			{
 				/*
@@ -64,17 +66,30 @@ public class ConnectAction implements ActionListener {
 				Reserved names are "","Server" and any blank string
 				 */
 				sout.println(name);
-				invalidName=sin.readBoolean();//the response of the server 
-				if(invalidName)
-					name= JOptionPane.showInputDialog
-						("pseudoname already exists, please type another name");
+				nameState=sin.readInt();//the response of the server 
+				String error_msg="";
+				switch(nameState)
+				{
+					case NameState.INVALID:
+					error_msg="Not a valid username, use only alphanumeric characters and underscore\n";
+					error_msg+="A username must contains at least 3 characters";
+						break;
+					case NameState.EXISTS:
+					error_msg="This name already exists, please type another name";
+						break;
+					case NameState.RESERVED:
+					error_msg="This name is reserved, try another";
+						break;
+				}
+				if(nameState!=NameState.VALID)
+					name= JOptionPane.showInputDialog(parent,error_msg);
 				if(name==null)//if user clicked on cancel
 				{
 					sout.println(name);//Don't know why I sent a null
 					sock.close();//close the connection
 					return;
 				}
-			}while(invalidName);//while the username is not valid asks the user again for another one
+			}while(nameState!=NameState.VALID);//while the username is not valid asks the user again for another one
 		}
 		catch(IOException e)// if the communication with the server has been interrupted
 		{
