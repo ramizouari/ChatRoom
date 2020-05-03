@@ -220,8 +220,9 @@ public class UserListener extends Thread
 			buff_reader.close();//closing connection with the user
 			users.remove(user.getUserName());//removing user
 			Room room=rooms.get(room_number);
-			if(room!=null)
-				room.remove(user);//remove user from the room
+			if(room==null)
+				return;
+			room.remove(user);//remove user from the room
 			if(rooms.get(room_number).usersNumber()==0)//if room is now empty
 				rooms.remove(room_number);//remove the room
 			else rooms.get(room_number).broadcast("connection to "+user.getUserName()+" is lost",

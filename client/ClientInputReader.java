@@ -29,7 +29,7 @@ public class ClientInputReader extends InputReader
 			try
 			{
 				msg=scn.nextLine();
-				if(msg.isBlank())
+				if((msg==null)||msg.matches("^[[:blank:]]*$"))
 					continue;
 				if(CommandsAlias.isCommand(msg))
 				{

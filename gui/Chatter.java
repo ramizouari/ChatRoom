@@ -63,7 +63,7 @@ public class Chatter extends JFrame {
 						//if the user clicked (and released) enter after typing messages
 						if(event.getKeyChar()==KeyEvent.VK_ENTER)
 						{
-								if(inputField.getText().isBlank())//if there is no input, then return
+								if(inputField.getText().matches("^[[:blank:]]*$"))//if there is no input, then return
 								return;
 							String msg=inputField.getText();//get the user's typed message
 							inTracker.add(msg);//add this message to the tracker's history
@@ -137,10 +137,12 @@ the server will respond by sending an error
 							try
 							{
 								String str=buff_reader.readLine();
+								if(str==null)
+									throw new IOException("Connection with Server lost");
 /*
 	the convTracker will read received message and try to find private messages to track them:
 	the userName of the other user will be stored
- */
+ */		
 								convTracker.track(str);
 								messageArea.setText(messageArea.getText()+"\n"
 									+str);

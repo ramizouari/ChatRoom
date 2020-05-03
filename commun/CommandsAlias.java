@@ -35,7 +35,7 @@ public class CommandsAlias
                 line=buff_reader.readLine();
                 if(line==null)
                     break;
-                else  if(line.isBlank()||line.charAt(0)=='#')//# for comments and also blank line is ignored
+                else  if(line.matches("^[[:blank:]]*$")||line.charAt(0)=='#')//# for comments and also blank line is ignored
                     continue;
                 T=line.split("\t| +");//seperator is a TAB
                 try
