@@ -63,7 +63,7 @@ public class Chatter extends JFrame {
 						//if the user clicked (and released) enter after typing messages
 						if(event.getKeyChar()==KeyEvent.VK_ENTER)
 						{
-								if(inputField.getText().matches("^[[:blank:]]*$"))//if there is no input, then return
+								if(inputField.getText().matches("^ *$"))//if there is no input, then return
 								return;
 							String msg=inputField.getText();//get the user's typed message
 							inTracker.add(msg);//add this message to the tracker's history
